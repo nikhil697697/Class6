@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Private Letter</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top, #292929 0%, #111 45%, #050505 100%);
+      color: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .card {
+      background: rgba(20, 20, 20, 0.92);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 24px;
+      padding: 38px;
+      box-shadow: 0 25px 80px rgba(0,0,0,.55);
+      backdrop-filter: blur(15px);
+    }
+
+    .lock {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 22px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin: 0 0 10px;
+      font-weight: 500;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 13px;
+      border: 1px solid #333;
+      background: #0d0d0d;
+      color: white;
+      outline: none;
+      font-size: 16px;
+      font-family: Arial, sans-serif;
+      transition: .2s;
+    }
+
+    input:focus {
+      border-color: #777;
+      box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+    }
+
+    button {
+      width: 100%;
+      margin-top: 13px;
+      padding: 16px;
+      border: 0;
+      border-radius: 13px;
+      background: white;
+      color: black;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: .9;
+    }
+
+    .error {
+      display: none;
+      text-align: center;
+      color: #ff7777;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    #letter {
+      display: none;
+      animation: reveal .8s ease forwards;
+    }
+
+    .letter-title {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 28px;
+      font-weight: 500;
+    }
+
+    .letter-content {
+      white-space: pre-wrap;
+      line-height: 1.9;
+      color: #e5e5e5;
+      font-size: 18px;
+    }
+
+    .signature {
+      margin-top: 35px;
+      text-align: right;
+      color: #aaa;
+      font-style: italic;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 27px 21px;
+        border-radius: 20px;
+      }
+
+      .letter-content {
+        font-size: 17px;
+        line-height: 1.8;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- PASSWORD SCREEN -->
+  <div class="card" id="login">
+
+    <div class="lock">🔒</div>
+
+    <h1>A Private Letter</h1>
+
+    <div class="subtitle">
+      This page is meant for someone special.
+    </div>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Enter the password"
+      autocomplete="off"
+    >
+
+    <button onclick="unlock()">
+      Unlock
+    </button>
+
+    <div class="error" id="error">
+      Wrong password. Try again.
+    </div>
+
+  </div>
+
+
+  <!-- LETTER -->
+  <div class="card" id="letter">
+
+    <div class="letter-title">
+      For You ❤️
+    </div>
+
+    <div class="letter-content" id="letterText"></div>
+
+    <div class="signature">
+      — Someone who means it
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+async function unlock() {
+
+  const input = document.getElementById("password");
+  const error = document.getElementById("error");
+  const button = document.querySelector("button");
+
+  const password = input.value;
+
+  if (!password) {
+    error.textContent = "Please enter the password.";
+    error.style.display = "block";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Unlocking...";
+
+  try {
+
+    const response = await fetch("/api/unlock", {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        password: password
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error("Wrong password");
+    }
+
+    document.getElementById("letterText").textContent = data.letter;
+
+    document.getElementById("login").classList.add("hidden");
+
+    document.getElementById("letter").style.display = "block";
+
+  } catch (err) {
+
+    error.textContent = "Wrong password. Try again.";
+    error.style.display = "block";
+
+    input.value = "";
+    input.focus();
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "Unlock";
+
+  }
+}
+
+
+// Press Enter to unlock
+document.getElementById("password").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    unlock();
+  }
+});
+
+</script>
+
+</body>
+</html>
