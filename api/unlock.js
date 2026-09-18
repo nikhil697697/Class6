@@ -9,7 +9,7 @@ const LETTER = `
 Hi love 
 even if you dont consider myself the love. 
 I planned to text you again and again tell you how badly i need you and all. cuz after all that has happened 
-and all the things i have proved against "my friend" i dont why but i thought you will consider giving US a chance .
+and all the things i have proved against "my friend" i don't know why but i thought you will consider giving US a chance .
 love - I literally proved his statements his ss his story his whole personality as lier i thought now atleast you will trust me but nothing was enough.
 
 You still think i am that asshole , i wish i was that asshole so moving on from you could have been eaiser .but no i loved you and always will.
